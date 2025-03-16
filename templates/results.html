@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>📊 ML Dashboard - Analysis Results</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #eef2f3;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 0;
+            padding: 30px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h2, h3 {
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 12px;
+        }
+        th {
+            background: #6c757d;
+            color: white;
+        }
+        .highlight {
+            background: #f8d7da;
+            border: 1px solid #721c24;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #721c24;
+        }
+        .prediction-form input {
+            padding: 12px;
+            margin: 5px;
+            width: 200px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .predict-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .predict-btn:hover {
+            background: #138496;
+        }
+        .prediction-result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #155724;
+        }
+        .loading {
+            display: none;
+            margin-top: 10px;
+        }
+        .back-btn {
+            display: inline-block;
+            background: #6c757d;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 Machine Learning Analysis Results</h2>
+    <h3>📦 Dataset Information</h3>
+    <table>
+        <tr><td><strong>Rows</strong></td><td>{{ dataset_info['shape'][0] }}</td></tr>
+        <tr><td><strong>Columns</strong></td><td>{{ dataset_info['shape'][1] }}</td></tr>
+    </table>
+    
+    {% set classification_results = results | selectattr("accuracy", "defined") | list %}
+    {% set best_model = classification_results | max(attribute='accuracy') %}
+    <div class="highlight">
+        ✅ Recommended Model: <strong>{{ best_model['model'] }}</strong> with Accuracy: <strong>{{ best_model['accuracy'] }}%</strong>
+    </div>
+    
+    <h3>🏅 Model Performance</h3>
+    <table>
+        <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1 Score</th></tr>
+        {% for result in results %}
+        <tr>
+            <td>{{ result['model'] }}</td>
+            {% if 'accuracy' in result %}
+                <td>{{ result['accuracy'] }}%</td>
+                <td>{{ result['precision'] }}%</td>
+                <td>{{ result['recall'] }}%</td>
+                <td>{{ result['f1_score'] }}%</td>
+            {% else %}
+                <td colspan="4">Regression model - No accuracy metrics</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h3>🔮 Make a Prediction</h3>
+    <div class="prediction-form">
+        <form id="predictionForm">
+            {% for feature in feature_names %}
+                <input type="text" name="{{ feature }}" placeholder="{{ feature }}" required>
+            {% endfor %}
+            <br>
+            <button type="submit" class="predict-btn">Predict</button>
+            <div class="loading">⏳ Predicting...</div>
+        </form>
+    </div>
+
+    <div class="prediction-result" id="predictionResult"></div>
+    <div style="margin-top: 20px;">
+        <a href="/" class="back-btn">⬅️ Upload Another File</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById("predictionForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let formData = new FormData(event.target);
+        let jsonObject = {};
+        formData.forEach((value, key) => { jsonObject[key] = value });
+
+        document.querySelector(".loading").style.display = "block";
+        document.getElementById("predictionResult").innerHTML = "";
+        
+        fetch('/predict', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(jsonObject)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector(".loading").style.display = "none";
+            document.getElementById("predictionResult").innerHTML = "🧠 Predicted Value: <strong>" + data.prediction + "</strong>";
+        })
+        .catch(error => {
+            document.querySelector(".loading").style.display = "none";
+            console.error("Error:", error);
+            document.getElementById("predictionResult").innerHTML = "⚠️ Prediction failed!";
+        });
+    });
+</script>
+
+</body>
+</html>

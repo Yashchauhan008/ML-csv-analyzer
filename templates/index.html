@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Upload Dataset - ML Analysis</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #a8c0ff, #3f2b96);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 420px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #fff;
+            font-size: 24px;
+        }
+        .upload-box {
+            border: 2px dashed #fff;
+            padding: 20px;
+            width: 100%;
+            margin: 15px 0;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: 0.3s;
+        }
+        .upload-box:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            background: #ff7eb3;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #ff5289;
+        }
+        .footer {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #fff;
+        }
+        .loading {
+            display: none;
+            font-size: 14px;
+            color: #ff7eb3;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Upload Dataset for Analysis</h2>
+    <form id="uploadForm" action="/analyze" method="post" enctype="multipart/form-data">
+        <label for="file" class="upload-box" id="uploadBox">Click or Drag & Drop CSV File Here</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Analyze Dataset</button>
+        <div class="loading" id="loadingText">Processing... Please wait.</div>
+    </form>
+    <div class="footer">
+        Supported file format: <b>CSV only</b>
+    </div>
+</div>
+
+<script>
+    document.getElementById("file").addEventListener("change", function(event) {
+        document.getElementById("uploadBox").innerText = event.target.files[0].name;
+    });
+
+    document.getElementById("uploadForm").addEventListener("submit", function() {
+        document.getElementById("loadingText").style.display = "block";
+    });
+</script>
+
+</body>
+</html>
