@@ -54,8 +54,8 @@ AdaBoost	90.93%	90.95%	90.93%	90.93%
 ## Installation & Usage
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/csv-analyzer.git
-   cd csv-analyzer
+   git clone https://github.com/Yashchauhan008/ML-csv-analyzer.git
+   cd ML-csv-analyzer
    ```
 2. Install dependencies:
    ```bash
